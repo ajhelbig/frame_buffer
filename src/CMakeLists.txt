@@ -1,7 +1,7 @@
 
 add_executable(${PROJECT_NAME} 
-	main.cpp
-	frame_buffer.cpp
+	main.c
+	frame_buffer.c
 )
 
 target_link_libraries(${PROJECT_NAME} 

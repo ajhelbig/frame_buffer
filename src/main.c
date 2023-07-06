@@ -1,4 +1,4 @@
-#include "frame_buffer.hpp"
+#include "frame_buffer.h"
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -11,8 +11,7 @@ int main(void)
     const int screenHeight = 500;
 
     Frame_Buffer fb;
-    Color bg = {0,0,0,255};
-    Frame_Buffer_Init(&fb, 500.0, 500.0, 50.0, bg);
+    Frame_Buffer_Init(&fb, 500.0, 500.0, 50.0, (Color){0,0,0,255});
 
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
 
@@ -31,12 +30,12 @@ int main(void)
         //----------------------------------------------------------------------------------
         BeginDrawing();
 
-            ClearBackground(BLACK);
-
-            DrawFPS(0,0);
+            ClearBackground((Color){255,255,255,255});
 
             Frame_Buffer_Draw(&fb);
 
+            DrawFPS(0,0);
+            
         EndDrawing();
         //----------------------------------------------------------------------------------
     }

@@ -1,6 +1,6 @@
-#include "frame_buffer.hpp"
+#include "frame_buffer.h"
 
-void Frame_Buffer_Init(Frame_Buffer *frame_buff, float width, float height, float pixel_size, Color color){
+void Frame_Buffer_Init(Frame_Buffer *frame_buff, int width, int height, int pixel_size, Color color){
 
 	frame_buff->width = width;
 	frame_buff->height = height;
@@ -9,7 +9,7 @@ void Frame_Buffer_Init(Frame_Buffer *frame_buff, float width, float height, floa
 	//allocating all the pixels
 	frame_buff->fb = (Pixel **)malloc((height / pixel_size) * sizeof(Pixel *));
 
-	for(int i = 0; i < height / pixel_size; ++i){
+	for(int i = 0; i < (height / pixel_size); ++i){
 
 		frame_buff->fb[i] = (Pixel *)malloc((width / pixel_size) * sizeof(Pixel));
 
@@ -26,7 +26,6 @@ void Frame_Buffer_Init(Frame_Buffer *frame_buff, float width, float height, floa
 
 	}
 
-
 }
 
 void Frame_Buffer_Destroy(Frame_Buffer *frame_buff){
@@ -42,22 +41,23 @@ void Frame_Buffer_Destroy(Frame_Buffer *frame_buff){
 
 }
 
-void Frame_Buffer_Draw(Frame_Buffer *frame_buff){ //seg faulting here
+void Frame_Buffer_Draw(Frame_Buffer *frame_buff){//drawing each pixel
 
-	for (int i = 0; i < frame_buff->width; ++i)
+	for (int i = 0; i < (frame_buff->width / frame_buff->pixel_size); ++i)
 	{
-		printf("fuck\n");
-		for (int j = 0; j < frame_buff->height; ++j)
-		{
-			printf("shit\n");
-			// Vector2 size = {frame_buff->pixel_size, frame_buff->pixel_size};
 
-			// DrawRectangleV(frame_buff->fb[i][j].pos,
-			// 				size,
-			// 				frame_buff->fb[i][j].color);
+		for (int j = 0; j < (frame_buff->height / frame_buff->pixel_size); ++j)
+		{
+			
+			DrawRectangleV(frame_buff->fb[i][j].pos,
+				(Vector2){frame_buff->pixel_size - 1, frame_buff->pixel_size - 1},
+				frame_buff->fb[i][j].color);
 
 		}
 
 	}
+
+	DrawLine(0, 0, frame_buff->width, 0, (Color){255,255,255,255});
+	DrawLine(1, 0, 1, frame_buff->height, (Color){255,255,255,255});
 
 }

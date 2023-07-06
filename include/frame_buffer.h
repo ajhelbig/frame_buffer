@@ -14,14 +14,14 @@ typedef struct Pixel{
 
 typedef struct Frame_Buffer{
 
-	float width;
-	float height;
-	float pixel_size;
+	int width;
+	int height;
+	int pixel_size;
 	Pixel **fb;
 
 } Frame_Buffer;
 
-void Frame_Buffer_Init(Frame_Buffer *fb, float width, float height, float pixel_size, Color color);
+void Frame_Buffer_Init(Frame_Buffer *fb, int width, int height, int pixel_size, Color color);
 void Frame_Buffer_Destroy(Frame_Buffer *fb);
 void Frame_Buffer_Draw(Frame_Buffer *fb);
 
