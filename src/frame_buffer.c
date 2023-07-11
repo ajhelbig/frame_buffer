@@ -1,6 +1,7 @@
 #include "frame_buffer.h"
 
 //primatives
+
 void Frame_Buffer_Init(Frame_Buffer *fb, int width, int height, int pixel_size, Color color){
 
 	fb->width = width;
@@ -80,6 +81,7 @@ void Frame_Buffer_Draw_Background(Frame_Buffer *fb){
 }
 
 //shapes
+
 int max(int a, int b){
 
 	if(a < b)
@@ -104,16 +106,13 @@ void Draw_Line(Frame_Buffer *fb, int x1, int y1, int x2, int y2, Color color){
 	//Find if neighboring pixels are within a threshold distance to the line
 	//to be drawn.
 
-	//calculate y = mx + b then convert to Ax + By + C = 0
+	double A = (fb->pixels[x1][y1].pos.y - fb->pixels[x2][y2].pos.y);
 
-	double m = (fb->pixels[y1][x1].pos.y - fb->pixels[y2][x2].pos.y) / 
-	(fb->pixels[y1][x1].pos.x - fb->pixels[y2][x2].pos.x);
+	//negative because the y axis is flipped
+	double B = -(fb->pixels[x1][y1].pos.x - fb->pixels[x2][y2].pos.x);
 
-	double b = fb->pixels[y1][x1].pos.y - (m * fb->pixels[y1][x1].pos.x);
-
-	double A = 1;
-	double B = -(1 / m);
-	double C = b / m;
+	double C = (fb->pixels[x1][y1].pos.x * fb->pixels[x2][y2].pos.y - 
+				fb->pixels[x2][y2].pos.x * fb->pixels[x1][y1].pos.y);
 
 	double denominator = sqrt(A * A + B * B);
 
@@ -124,22 +123,38 @@ void Draw_Line(Frame_Buffer *fb, int x1, int y1, int x2, int y2, Color color){
 
 		for(int j = min(y1, y2); j <= max(y1, y2); ++j){
 
-			//probably more cache efficient to access in [i][j] not sure though
+			double Ax = A * fb->pixels[i][j].pos.x;
+			double By = B * fb->pixels[i][j].pos.y;
 
-			double Ax = A * fb->pixels[j][i].pos.x;//probably be cache inefficient
-			double By = B * fb->pixels[j][i].pos.y;//probably cache inefficient
-
-			double numerator = (abs(Ax + By + C ));
+			double numerator = (fabs(Ax + By + C ));
 
 			double dist = numerator / denominator;
 
 			if(dist <= max_distance){
-				fb->pixels[j][i].color = color;//probably cache inefficient
+				fb->pixels[i][j].color = color;
 			}
 
 		}
 
 	}
+
+}
+
+//animations
+
+void Rotating_Line(Frame_Buffer *fb, int len, int points, int point, Color color){
+
+	point %= points;
+	double points_size = 360.0 / points;//make better names for theses vars
+	double degree = point * points_size;
+
+	double centerx = (fb->width / fb->pixel_size) / 2.0;
+	double centery = (fb->height / fb->pixel_size) / 2.0;
+
+	int endx = ((double)len * sin(DEG2RAD * degree)) + centerx;
+	int endy = ((double)len * cos(DEG2RAD * degree)) + centery;
+
+	Draw_Line(fb, centerx, centery, endx, endy, color);
 
 }
 

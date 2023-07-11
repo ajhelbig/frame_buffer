@@ -7,18 +7,20 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 500;
-    const int screenHeight = 500;
+    const int screenWidth = 510;
+    const int screenHeight = 510;
     int pixelSize = 10;
-    int virtualSW = (screenWidth / pixelSize) - 1;
-    int virtualSH = (screenHeight / pixelSize) - 1;
+    int virtualSW = (screenWidth / pixelSize);
+    int virtualSH = (screenHeight / pixelSize);
 
     Frame_Buffer fb;
     Frame_Buffer_Init(&fb, screenWidth, screenHeight, pixelSize, (Color){0,0,0,255});
 
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
 
-    //SetTargetFPS(4);               // Set our game to run at 60 frames-per-second
+    int current_point_on_circle = 0;
+
+    SetTargetFPS(10);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     // Main game loop
@@ -38,7 +40,9 @@ int main(void)
 
             Frame_Buffer_Draw_Background(&fb);            
 
-            Draw_Line(&fb, virtualSW / 2, virtualSH / 2, virtualSW / 4, virtualSH / 4, (Color){255,255,255,255});
+            Rotating_Line(&fb, 20, 32, current_point_on_circle, (Color){255,255,255,255});
+
+            current_point_on_circle += 1;
 
             Frame_Buffer_Draw(&fb);
             

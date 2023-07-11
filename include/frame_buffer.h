@@ -33,4 +33,7 @@ void Frame_Buffer_Draw_Background(Frame_Buffer *fb);
 //shapes
 void Draw_Line(Frame_Buffer *fb, int x1, int y1, int x2, int y2, Color color);
 
+//animations
+void Rotating_Line(Frame_Buffer *fb, int len, int points, int point, Color color);
+
 #endif
