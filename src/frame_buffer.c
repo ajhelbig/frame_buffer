@@ -6,6 +6,8 @@ void Frame_Buffer_Init(Frame_Buffer *fb, int width, int height, int pixel_size, 
 
 	fb->width = width;
 	fb->height = height;
+	fb->virtual_width = width / pixel_size;
+	fb->virtual_height = height / pixel_size;
 	fb->pixel_size = pixel_size;
 	fb->background_color = color;
 
@@ -35,7 +37,7 @@ void Frame_Buffer_Init(Frame_Buffer *fb, int width, int height, int pixel_size, 
 
 void Frame_Buffer_Destroy(Frame_Buffer *fb){
 
-	for (int i = 0; i < (fb->height / fb->pixel_size); ++i)
+	for (int i = 0; i < fb->virtual_height; ++i)
 	{
 
 		free(fb->pixels[i]);
@@ -48,10 +50,10 @@ void Frame_Buffer_Destroy(Frame_Buffer *fb){
 
 void Frame_Buffer_Draw(Frame_Buffer *fb){//drawing each pixel
 
-	for (int i = 0; i < (fb->width / fb->pixel_size); ++i)
+	for (int i = 0; i < fb->virtual_width; ++i)
 	{
 
-		for (int j = 0; j < (fb->height / fb->pixel_size); ++j)
+		for (int j = 0; j < fb->virtual_height; ++j)
 		{
 			
 			DrawRectangleV(fb->pixels[i][j].draw_pos,
@@ -68,11 +70,11 @@ void Frame_Buffer_Draw(Frame_Buffer *fb){//drawing each pixel
 
 void Frame_Buffer_Draw_Background(Frame_Buffer *fb){
 
-	for(int i = 0; i < fb->width / fb->pixel_size; ++i){
+	for(int i = 0; i < fb->virtual_width; ++i){
 
-		for(int j = 0; j < fb->height / fb->pixel_size; ++j){
+		for(int j = 0; j < fb->virtual_height; ++j){
 
-			fb->pixels[i][j].color = fb->background_color;
+			Draw_Pixel(fb, i, j, fb->background_color);
 
 		}
 
@@ -80,12 +82,33 @@ void Frame_Buffer_Draw_Background(Frame_Buffer *fb){
 
 }
 
+void Draw_Pixel(Frame_Buffer *fb, int x, int y, Color color){
+
+	fb->pixels[x][y].color = color;
+
+}
+
+void Background_Color(Frame_Buffer *fb, Color color){
+
+	fb->background_color = color;
+
+}
+
 //shapes
 
-int max(int a, int b){
+int max(int a, int b, int max){
 
-	if(a < b)
+	if(a < b){
+
+		if(b > max)
+			return max;
+
 		return b;
+
+	}
+
+	if(a > max)
+		return max;
 
 	return a;
 
@@ -93,8 +116,17 @@ int max(int a, int b){
 
 int min(int a, int b){
 
-	if(a < b)
+	if(a < b){
+
+		if(a < 0)
+			return 0;
+
 		return a;
+
+	}
+
+	if(b < 0)
+		return 0;
 
 	return b;
 
@@ -107,31 +139,37 @@ void Draw_Line(Frame_Buffer *fb, int x1, int y1, int x2, int y2, Color color){
 	//to be drawn.
 
 	double A = (fb->pixels[x1][y1].pos.y - fb->pixels[x2][y2].pos.y);
+	//double A = (((y1 * fb->pixel_size) + fb->pixel_size / 2) - ((y2 * fb->pixel_size) + fb->pixel_size / 2));
 
 	//negative because the y axis is flipped
 	double B = -(fb->pixels[x1][y1].pos.x - fb->pixels[x2][y2].pos.x);
+	//double B = -(((x1 * fb->pixel_size) + fb->pixel_size / 2) - ((x2 * fb->pixel_size) + fb->pixel_size / 2));
 
 	double C = (fb->pixels[x1][y1].pos.x * fb->pixels[x2][y2].pos.y - 
 				fb->pixels[x2][y2].pos.x * fb->pixels[x1][y1].pos.y);
+	// double C = (((x1 * fb->pixel_size) + fb->pixel_size / 2) * ((y2 * fb->pixel_size) + fb->pixel_size / 2)) - 
+	// 		   (((x2 * fb->pixel_size) + fb->pixel_size / 2) * ((y1 * fb->pixel_size) + fb->pixel_size / 2));
 
 	double denominator = sqrt(A * A + B * B);
 
 	//max distance from line is half the lenght of a pixels side length
 	double max_distance = (fb->pixel_size / 2);
 
-	for(int i = min(x1, x2); i <= max(x1, x2); ++i){
+	for(int i = min(x1, x2); i <= max(x1, x2, fb->virtual_width); ++i){
 
-		for(int j = min(y1, y2); j <= max(y1, y2); ++j){
+		for(int j = min(y1, y2); j <= max(y1, y2, fb->virtual_height); ++j){
 
 			double Ax = A * fb->pixels[i][j].pos.x;
 			double By = B * fb->pixels[i][j].pos.y;
 
-			double numerator = (fabs(Ax + By + C ));
+			double numerator = (fabs(Ax + By + C));
 
 			double dist = numerator / denominator;
 
 			if(dist <= max_distance){
-				fb->pixels[i][j].color = color;
+
+				Draw_Pixel(fb, i, j, color);
+
 			}
 
 		}

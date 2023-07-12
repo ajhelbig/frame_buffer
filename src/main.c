@@ -20,7 +20,7 @@ int main(void)
 
     int current_point_on_circle = 0;
 
-    SetTargetFPS(10);               // Set our game to run at 60 frames-per-second
+    //SetTargetFPS(10);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     // Main game loop
@@ -38,7 +38,9 @@ int main(void)
 
             //frame buffer emulator
 
-            Frame_Buffer_Draw_Background(&fb);            
+            Frame_Buffer_Draw_Background(&fb);
+
+            //Draw_Line(&fb, -1,-1, virtualSW - 1, virtualSH - 1, WHITE);      
 
             Rotating_Line(&fb, 20, 32, current_point_on_circle, (Color){255,255,255,255});
 
