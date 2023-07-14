@@ -19,6 +19,7 @@ int main(void)
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
 
     int current_point_on_circle = 0;
+    Vector2 pts[] = {(Vector2){10, 10}, (Vector2){virtualSW - 10, 10}, (Vector2){virtualSW - 10, virtualSH - 10}, (Vector2){10, virtualSH - 10}};
 
     SetTargetFPS(10);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
@@ -46,6 +47,8 @@ int main(void)
             Rotating_Line(&fb, 15, 32, current_point_on_circle, (Color){255,255,255,255});
 
             current_point_on_circle += 1;
+
+            Draw_Poly(&fb, 4, pts, (Color){255,255,255,255});
 
             Frame_Buffer_Draw(&fb);
             

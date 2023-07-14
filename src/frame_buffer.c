@@ -84,7 +84,8 @@ void Frame_Buffer_Draw_Background(Frame_Buffer *fb){
 
 void Draw_Pixel(Frame_Buffer *fb, int x, int y, Color color){
 
-	fb->pixels[y][x].color = color;
+	if(y >= 0 && y < fb->virtual_height && x >= 0 && x < fb->virtual_width )
+		fb->pixels[y][x].color = color;
 
 }
 
@@ -134,9 +135,12 @@ void Draw_Line(Frame_Buffer *fb, int x1, int y1, int x2, int y2, Color color){
 
 	for(int y = min(y1, y2); y <= max(y1, y2); ++y){
 
+		if(y < 0 || y >= fb->virtual_height)
+			continue; //may be able to optimize this
+
 		for(int x = min(x1, x2); x <= max(x1, x2); ++x){
 
-			if(x < 0 || x >= fb->virtual_width || y < 0 || y >= fb->virtual_height)
+			if(x < 0 || x >= fb->virtual_width)
 				continue; //may be able to optimize this
 
 			double Ax = A * ((double)(x * fb->pixel_size) + fb->pixel_size / 2.0);
@@ -158,6 +162,16 @@ void Draw_Line(Frame_Buffer *fb, int x1, int y1, int x2, int y2, Color color){
 
 }
 
+void Draw_Poly(Frame_Buffer *fb, int numPts, Vector2 pts[], Color color){
+
+	for(int i = 0; i < numPts - 1; ++i){
+		Draw_Line(fb, pts[i].x, pts[i].y, pts[i + 1].x, pts[i + 1].y, color);
+	}
+
+	Draw_Line(fb, pts[numPts - 1].x, pts[numPts - 1].y, pts[0].x, pts[0].y, color);
+
+}
+
 //animations
 
 void Rotating_Line(Frame_Buffer *fb, int len, int points, int point, Color color){
@@ -175,4 +189,3 @@ void Rotating_Line(Frame_Buffer *fb, int len, int points, int point, Color color
 	Draw_Line(fb, centerx, centery, endx, endy, color);
 
 }
-
