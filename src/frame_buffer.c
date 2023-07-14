@@ -84,7 +84,7 @@ void Frame_Buffer_Draw_Background(Frame_Buffer *fb){
 
 void Draw_Pixel(Frame_Buffer *fb, int x, int y, Color color){
 
-	fb->pixels[x][y].color = color;
+	fb->pixels[y][x].color = color;
 
 }
 
@@ -96,19 +96,10 @@ void Background_Color(Frame_Buffer *fb, Color color){
 
 //shapes
 
-int max(int a, int b, int max){
+int max(int a, int b){
 
-	if(a < b){
-
-		if(b > max)
-			return max;
-
+	if(a < b)
 		return b;
-
-	}
-
-	if(a > max)
-		return max;
 
 	return a;
 
@@ -116,51 +107,40 @@ int max(int a, int b, int max){
 
 int min(int a, int b){
 
-	if(a < b){
+	if(a > b)
+		return b;
 
-		if(a < 0)
-			return 0;
-
-		return a;
-
-	}
-
-	if(b < 0)
-		return 0;
-
-	return b;
+	return a;
 
 }
 
 void Draw_Line(Frame_Buffer *fb, int x1, int y1, int x2, int y2, Color color){
 
-	//Goal to use |Ax0 + By0 + C| / sqrt(A^2 + B^2)
-	//Find if neighboring pixels are within a threshold distance to the line
-	//to be drawn.
+	// Goal to use |Ax0 + By0 + C| / sqrt(A^2 + B^2) to
+	// find if neighboring pixels are within a threshold 
+	// distance to the line to be drawn.
 
-	double A = (fb->pixels[x1][y1].pos.y - fb->pixels[x2][y2].pos.y);
-	//double A = (((y1 * fb->pixel_size) + fb->pixel_size / 2) - ((y2 * fb->pixel_size) + fb->pixel_size / 2));
+	double A = ( ((double)(y1 * fb->pixel_size) + fb->pixel_size / 2.0) - ((double)(y2 * fb->pixel_size) + fb->pixel_size / 2.0) );
 
-	//negative because the y axis is flipped
-	double B = -(fb->pixels[x1][y1].pos.x - fb->pixels[x2][y2].pos.x);
-	//double B = -(((x1 * fb->pixel_size) + fb->pixel_size / 2) - ((x2 * fb->pixel_size) + fb->pixel_size / 2));
+	double B = -( ((double)(x1 * fb->pixel_size) + fb->pixel_size / 2.0) - ((double)(x2 * fb->pixel_size) + fb->pixel_size / 2.0) );
 
-	double C = (fb->pixels[x1][y1].pos.x * fb->pixels[x2][y2].pos.y - 
-				fb->pixels[x2][y2].pos.x * fb->pixels[x1][y1].pos.y);
-	// double C = (((x1 * fb->pixel_size) + fb->pixel_size / 2) * ((y2 * fb->pixel_size) + fb->pixel_size / 2)) - 
-	// 		   (((x2 * fb->pixel_size) + fb->pixel_size / 2) * ((y1 * fb->pixel_size) + fb->pixel_size / 2));
+	double C = ( ((double)(x1 * fb->pixel_size) + fb->pixel_size / 2.0) * ((double)(y2 * fb->pixel_size) + fb->pixel_size / 2.0) - 
+				((double)(x2 * fb->pixel_size) + fb->pixel_size / 2.0) * ((double)(y1 * fb->pixel_size) + fb->pixel_size / 2.0) );
 
 	double denominator = sqrt(A * A + B * B);
 
 	//max distance from line is half the lenght of a pixels side length
-	double max_distance = (fb->pixel_size / 2);
+	double max_distance = (fb->pixel_size / 2.0);
 
-	for(int i = min(x1, x2); i <= max(x1, x2, fb->virtual_width); ++i){
+	for(int y = min(y1, y2); y <= max(y1, y2); ++y){
 
-		for(int j = min(y1, y2); j <= max(y1, y2, fb->virtual_height); ++j){
+		for(int x = min(x1, x2); x <= max(x1, x2); ++x){
 
-			double Ax = A * fb->pixels[i][j].pos.x;
-			double By = B * fb->pixels[i][j].pos.y;
+			if(x < 0 || x >= fb->virtual_width || y < 0 || y >= fb->virtual_height)
+				continue; //may be able to optimize this
+
+			double Ax = A * ((double)(x * fb->pixel_size) + fb->pixel_size / 2.0);
+			double By = B * ((double)(y * fb->pixel_size) + fb->pixel_size / 2.0);
 
 			double numerator = (fabs(Ax + By + C));
 
@@ -168,7 +148,7 @@ void Draw_Line(Frame_Buffer *fb, int x1, int y1, int x2, int y2, Color color){
 
 			if(dist <= max_distance){
 
-				Draw_Pixel(fb, i, j, color);
+				Draw_Pixel(fb, x, y, color);
 
 			}
 
@@ -186,11 +166,11 @@ void Rotating_Line(Frame_Buffer *fb, int len, int points, int point, Color color
 	double points_size = 360.0 / points;//make better names for theses vars
 	double degree = point * points_size;
 
-	double centerx = (fb->width / fb->pixel_size) / 2.0;
-	double centery = (fb->height / fb->pixel_size) / 2.0;
+	double centerx = (fb->virtual_width) / 2.0;
+	double centery = (fb->virtual_height) / 2.0;
 
-	int endx = ((double)len * sin(DEG2RAD * degree)) + centerx;
-	int endy = ((double)len * cos(DEG2RAD * degree)) + centery;
+	int endx = ((double)len * cos(DEG2RAD * degree)) + centerx;
+	int endy = -((double)len * sin(DEG2RAD * degree)) + centery;
 
 	Draw_Line(fb, centerx, centery, endx, endy, color);
 
