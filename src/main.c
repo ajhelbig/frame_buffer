@@ -18,10 +18,13 @@ int main(void)
 
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
 
-    int current_point_on_circle = 0;
-    Vector2 pts[] = {(Vector2){10, 10}, (Vector2){virtualSW - 10, 10}, (Vector2){virtualSW - 10, virtualSH - 10}, (Vector2){10, virtualSH - 10}};
+    int current_point = 0;
 
-    SetTargetFPS(10);               // Set our game to run at 60 frames-per-second
+    Vector2 pts[] = {(Vector2){10, 10}, (Vector2){virtualSW - 11, 10}, (Vector2){virtualSW / 2, virtualSH / 2}, (Vector2){virtualSW - 11, virtualSH - 11}, (Vector2){10, virtualSH - 11}};
+
+    // Vector2 pts[] = {(Vector2){10, virtualSW / 2}, (Vector2){10, virtualSH - 10}, (Vector2){virtualSW - 10, virtualSH - 10}};
+
+    //SetTargetFPS(1);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     // Main game loop
@@ -39,16 +42,21 @@ int main(void)
 
             //frame buffer emulator
 
-            if(current_point_on_circle == 32){
-                current_point_on_circle = 0;
-                Frame_Buffer_Draw_Background(&fb);
-            }
+            // if(current_point == 32){
+            //     current_point = 0;
+            //     Frame_Buffer_Draw_Background(&fb);
+            // }
 
-            Rotating_Line(&fb, 15, 32, current_point_on_circle, (Color){255,255,255,255});
+            Frame_Buffer_Draw_Background(&fb);
 
-            current_point_on_circle += 1;
+            //Rotating_Line(&fb, 25, 32, current_point, (Color){255,255,255,255});
 
-            Draw_Poly(&fb, 4, pts, (Color){255,255,255,255});
+            //Draw_Line(&fb, 10, 10, virtualSW - 10, 11, (Color){255,255,255,255});
+
+            current_point += 1;
+
+            //Draw_Poly(&fb, 4, pts, (Color){255,255,255,255});
+            Rotating_Poly(&fb, 5, pts, 360, current_point, (Color){255,255,255,255});
 
             Frame_Buffer_Draw(&fb);
             

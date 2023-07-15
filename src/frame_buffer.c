@@ -121,12 +121,13 @@ void Draw_Line(Frame_Buffer *fb, int x1, int y1, int x2, int y2, Color color){
 	// find if neighboring pixels are within a threshold 
 	// distance to the line to be drawn.
 
+	//need to do this using relative coordinates in case coordinates are off the screen
 	double A = ( ((double)(y1 * fb->pixel_size) + fb->pixel_size / 2.0) - ((double)(y2 * fb->pixel_size) + fb->pixel_size / 2.0) );
 
 	double B = -( ((double)(x1 * fb->pixel_size) + fb->pixel_size / 2.0) - ((double)(x2 * fb->pixel_size) + fb->pixel_size / 2.0) );
 
 	double C = ( ((double)(x1 * fb->pixel_size) + fb->pixel_size / 2.0) * ((double)(y2 * fb->pixel_size) + fb->pixel_size / 2.0) - 
-				((double)(x2 * fb->pixel_size) + fb->pixel_size / 2.0) * ((double)(y1 * fb->pixel_size) + fb->pixel_size / 2.0) );
+				 ((double)(x2 * fb->pixel_size) + fb->pixel_size / 2.0) * ((double)(y1 * fb->pixel_size) + fb->pixel_size / 2.0) );
 
 	double denominator = sqrt(A * A + B * B);
 
@@ -164,11 +165,56 @@ void Draw_Line(Frame_Buffer *fb, int x1, int y1, int x2, int y2, Color color){
 
 void Draw_Poly(Frame_Buffer *fb, int numPts, Vector2 pts[], Color color){
 
+	//the order of the points matters lines drawn from p0 -> p1 ... pn -> p0
 	for(int i = 0; i < numPts - 1; ++i){
 		Draw_Line(fb, pts[i].x, pts[i].y, pts[i + 1].x, pts[i + 1].y, color);
 	}
 
 	Draw_Line(fb, pts[numPts - 1].x, pts[numPts - 1].y, pts[0].x, pts[0].y, color);
+
+}
+
+//math
+
+void Rotate(Vector2 *pt, float deg){
+
+	float x = pt->x;
+	float y = pt->y;
+
+	pt->x = (x * cos(DEG2RAD * deg)) - (y * sin(DEG2RAD * deg));
+	pt->y = (x * sin(DEG2RAD * deg)) + (y * cos(DEG2RAD * deg));
+
+}
+
+void Translate(Vector2 *pt, int x, int y){
+
+	pt->x = pt->x + x;
+	pt->y = pt->y + y;
+
+}
+
+void Rotate_2D(Vector2 origin, int numPts, Vector2 pts[], float deg){
+
+	//translate to origin
+	for(int i = 0; i < numPts; ++i){
+
+		Translate(&pts[i], -origin.x, -origin.y);
+
+	}
+
+	//rotate about origin
+	for(int i = 0; i < numPts; ++i){
+
+		Rotate(&pts[i], deg);
+
+	}
+
+	//translate back to original position
+	for(int i = 0; i < numPts; ++i){
+
+		Translate(&pts[i], origin.x, origin.y);
+
+	}
 
 }
 
@@ -183,9 +229,29 @@ void Rotating_Line(Frame_Buffer *fb, int len, int points, int point, Color color
 	double centerx = (fb->virtual_width) / 2.0;
 	double centery = (fb->virtual_height) / 2.0;
 
+	Vector2 origin;
+	origin.x = (fb-> virtual_width) / 2.0;
+	origin.y = (fb->virtual_height) / 2.0;
+
 	int endx = ((double)len * cos(DEG2RAD * degree)) + centerx;
 	int endy = -((double)len * sin(DEG2RAD * degree)) + centery;
 
 	Draw_Line(fb, centerx, centery, endx, endy, color);
+
+}
+
+void Rotating_Poly(Frame_Buffer *fb, int numPts, Vector2 pts[], int numPos, int currPos, Color color){
+
+	currPos %= numPts;
+	double arc_angle = 360.0 / numPos;//make better names for theses vars
+	double degree = currPos * arc_angle;
+
+	Vector2 origin;
+	origin.x = (fb->virtual_width) / 2.0;
+	origin.y = (fb->virtual_height) / 2.0;
+
+	Rotate_2D(origin, numPts, pts, degree);
+
+	Draw_Poly(fb, numPts, pts, color);
 
 }

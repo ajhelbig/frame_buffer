@@ -5,6 +5,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "math.h"
+#include "stdbool.h"
 
 typedef struct Pixel{
 
@@ -38,8 +39,12 @@ void Background_Color(Frame_Buffer *fb, Color color);
 void Draw_Line(Frame_Buffer *fb, int x1, int y1, int x2, int y2, Color color);
 void Draw_Poly(Frame_Buffer *fb, int numPts, Vector2 pts[], Color color);
 
+//math
+void Rotate_2D(Vector2 origin, int numPts, Vector2 pts[], float deg);
+
 //animations
 void Rotating_Line(Frame_Buffer *fb, int len, int points, int point, Color color);
+void Rotating_Poly(Frame_Buffer *fb, int numPts, Vector2 pts[], int numPos, int currPos, Color color);
 
 
 #endif
