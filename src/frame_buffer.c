@@ -218,6 +218,22 @@ void Rotate_2D(Vector2 origin, int numPts, Vector2 pts[], float deg){
 
 }
 
+Vector2* Round(int numPts, Vector2 pts[]){
+
+	Vector2 *roundedPts = (Vector2*)malloc(numPts * sizeof(Vector2));
+
+	for (int i = 0; i < numPts; ++i)
+	{
+
+		roundedPts[i].x = round(pts[i].x);
+		roundedPts[i].y = round(pts[i].y);
+
+	}
+
+	return roundedPts;
+
+}
+
 //animations
 
 void Rotating_Line(Frame_Buffer *fb, int len, int points, int point, Color color){
@@ -252,6 +268,10 @@ void Rotating_Poly(Frame_Buffer *fb, int numPts, Vector2 pts[], int numPos, int 
 
 	Rotate_2D(origin, numPts, pts, degree);
 
+	Vector2 *roundedPts = Round(numPts, pts);
+
 	Draw_Poly(fb, numPts, pts, color);
+
+	free(roundedPts);
 
 }
