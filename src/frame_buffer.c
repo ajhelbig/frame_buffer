@@ -163,7 +163,15 @@ void Draw_Line(Frame_Buffer *fb, int x1, int y1, int x2, int y2, Color color){
 
 }
 
-void Draw_Poly(Frame_Buffer *fb, int numPts, Vector2 pts[], Color color){
+bool inShape(int numPts, Vector2 pts[], Vector2 pt){
+
+	//implement point in polygon algorithm
+
+	return false;
+
+} 
+
+void Draw_Poly(Frame_Buffer *fb, int numPts, Vector2 pts[], Color color, bool fill){
 
 	//the order of the points matters lines drawn from p0 -> p1 ... pn -> p0
 	for(int i = 0; i < numPts - 1; ++i){
@@ -171,6 +179,26 @@ void Draw_Poly(Frame_Buffer *fb, int numPts, Vector2 pts[], Color color){
 	}
 
 	Draw_Line(fb, pts[numPts - 1].x, pts[numPts - 1].y, pts[0].x, pts[0].y, color);
+
+	if(fill){
+
+		for (int i = 0; i < fb->virtual_width; ++i)
+		{
+			
+			for (int j = 0; j < fb->virtual_height; ++j)
+			{
+				
+				if(inShape(numPts, pts, fb->pixels[i][j].pos)){
+
+					Draw_Pixel(fb, fb->pixels[i][j].pos.y, fb->pixels[i][j].pos.y, color);
+
+				}
+
+			}
+
+		}
+
+	}
 
 }
 
@@ -270,7 +298,7 @@ void Rotating_Poly(Frame_Buffer *fb, int numPts, Vector2 pts[], int numPos, int 
 
 	Vector2 *roundedPts = Round(numPts, pts);
 
-	Draw_Poly(fb, numPts, pts, color);
+	Draw_Poly(fb, numPts, pts, color, true);
 
 	free(roundedPts);
 

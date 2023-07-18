@@ -7,9 +7,9 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 510;
-    const int screenHeight = 510;
-    int pixelSize = 10;
+    const int screenWidth = 515;
+    const int screenHeight = 515;
+    int pixelSize = 5;
     int virtualSW = (screenWidth / pixelSize);
     int virtualSH = (screenHeight / pixelSize);
 
@@ -20,11 +20,11 @@ int main(void)
 
     int current_point = 0;
 
-    Vector2 pts[] = {(Vector2){10, 10}, (Vector2){virtualSW - 11, 10}, (Vector2){virtualSW / 2, virtualSH / 2}, (Vector2){virtualSW - 11, virtualSH - 11}, (Vector2){10, virtualSH - 11}};
+    //Vector2 pts[] = {(Vector2){10, 10}, (Vector2){virtualSW - 11, 10}, (Vector2){virtualSW / 2, virtualSH / 2}, (Vector2){virtualSW - 11, virtualSH - 11}, (Vector2){10, virtualSH - 11}};
 
-    // Vector2 pts[] = {(Vector2){10, virtualSW / 2}, (Vector2){10, virtualSH - 10}, (Vector2){virtualSW - 10, virtualSH - 10}};
+    Vector2 pts[] = {(Vector2){10, virtualSW / 2}, (Vector2){10, virtualSH - 10}, (Vector2){virtualSW - 10, virtualSH - 10}};
 
-    //SetTargetFPS(5);               // Set our game to run at 60 frames-per-second
+    // SetTargetFPS(1);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     // Main game loop
@@ -46,7 +46,7 @@ int main(void)
 
             current_point += 1;
 
-            Rotating_Poly(&fb, 5, pts, 360, current_point, (Color){255,255,255,255});
+            Rotating_Poly(&fb, 3, pts, 360, current_point, (Color){255,255,255,255});
 
             Frame_Buffer_Draw(&fb);
             
