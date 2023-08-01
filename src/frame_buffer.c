@@ -167,6 +167,14 @@ bool inShape(int numPts, Vector2 pts[], Vector2 pt){
 
 	//implement point in polygon algorithm
 
+	//find equation of the line from pt horizontally to the right edge of the screen
+
+	//find equation of the lines forming the shape
+
+	//determine if pt line intersects and even or odd number of shape lines
+
+	//if even pt is outside the shape if odd the pt is inside the shape
+
 	return false;
 
 } 
